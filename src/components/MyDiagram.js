@@ -7,8 +7,11 @@ import { GojsDiagram, ModelChangeEventType } from "react-gojs";
 import MainMenu from "./MainMenu";
 import { EditPanel } from "./EditPanel";
 import { getNodeTypes } from "../redux/actions/nodesActions";
+import { exportArch } from "../redux/actions/diagramActions";
 import "./MyDiagram.css";
 import Modal from "./Modal";
+import { Button } from "@material-ui/core";
+import createJson from "../helpers/createJson";
 
 class MyDiagram extends React.Component {
   nodeId = 0;
@@ -19,18 +22,10 @@ class MyDiagram extends React.Component {
     selectedNodeKeys: [],
     model: {
       nodeDataArray: [
-        { key: "Alpha", label: "Alpha", color: "lightblue" },
-        { key: "Beta", label: "Beta", color: "orange" },
-        { key: "Gamma", label: "Gamma", color: "lightgreen" },
-        { key: "Delta", label: "Delta", color: "pink" },
-        { key: "Omega", label: "Omega", color: "grey" }
+        { key: "Alpha", label: "name", color: "pink", type: "Alpha" },
+        { key: "Betta", label: "name2", color: "blue", type: "Betta" }
       ],
-      linkDataArray: [
-        { from: "Alpha", to: "Beta" },
-        { from: "Alpha", to: "Gamma" },
-        { from: "Beta", to: "Delta" },
-        { from: "Gamma", to: "Omega" }
-      ]
+      linkDataArray: [{ from: "Alpha", to: "Betta" }]
     }
   };
 
@@ -45,6 +40,8 @@ class MyDiagram extends React.Component {
   }
 
   render() {
+    const { model } = this.state;
+    const { exportArch } = this.props;
     return (
       <section>
         <MainMenu addNode={this.addNode} />
@@ -55,7 +52,14 @@ class MyDiagram extends React.Component {
           className="myDiagram"
           createDiagram={this.createDiagram}
           onModelChange={this.modelChangeHandler}
+          linkKeyProperty="key"
         />
+        <Button
+          style={{ float: "right" }}
+          onClick={() => exportArch({ ...model })}
+        >
+          Export JSON
+        </Button>
         <EditPanel
           node={this.state.contextNode}
           onClose={this.onEditPanelClose}
@@ -105,8 +109,16 @@ class MyDiagram extends React.Component {
         { strokeWidth: 0 },
         new go.Binding("fill", "color")
       ),
-      $(go.TextBlock, { position: "relative" }, new go.Binding("text", "key")),
-      $(go.TextBlock, { margin: 8 }, new go.Binding("text", "label"))
+      $(
+        go.TextBlock,
+        { position: "relative" },
+        new go.Binding("text", "label")
+      ),
+      $(
+        go.TextBlock,
+        { margin: 8, font: "Italic small-caps bold 13px Georgia, Serif" },
+        new go.Binding("text", "type")
+      )
     );
     const that = this;
     myDiagram.addDiagramListener("ObjectSingleClicked", function(e) {
@@ -234,7 +246,8 @@ class MyDiagram extends React.Component {
           {
             key: newNodeId,
             label: label || "New Node",
-            color: color || "Blue"
+            color: color || "Blue",
+            type: label || "Node type"
           }
         ],
         linkDataArray:
@@ -263,7 +276,8 @@ class MyDiagram extends React.Component {
 }
 
 const mapDispatchToProps = {
-  getNodeTypes
+  getNodeTypes,
+  exportArch
 };
 
 export default connect(null, mapDispatchToProps)(MyDiagram);

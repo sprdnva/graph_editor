@@ -11,7 +11,9 @@ import {
 
 const useStyles = makeStyles(() => ({
   drawerPaper: {
-    width: 180,
+    width: 200
+  },
+  content: {
     padding: 10
   }
 }));
@@ -19,7 +21,6 @@ const useStyles = makeStyles(() => ({
 export const EditPanel = props => {
   const classes = useStyles();
   const { node, onClose, onSubmit } = props;
-  //   const [isOpen, setState] = useState(true);
   const [newName, setNewName] = useState("");
 
   const toggleDrawer = () => event => {
@@ -35,7 +36,7 @@ export const EditPanel = props => {
       onClick={toggleDrawer(false)}
       onKeyDown={toggleDrawer(false)}
     >
-      <FormControl>
+      <FormControl className="content">
         <InputLabel htmlFor="my-input">New node name</InputLabel>
         <Input
           id="my-input"
@@ -44,6 +45,7 @@ export const EditPanel = props => {
         />
         <Button onClick={() => onSubmit(newName)}>Change name</Button>
       </FormControl>
+      <div className="content">{node.key}</div>
     </div>
   );
 
