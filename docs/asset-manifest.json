@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/graph_editor/static/css/main.0c22df1b.chunk.css",
+    "main.js": "/graph_editor/static/js/main.0975c9ec.chunk.js",
+    "main.js.map": "/graph_editor/static/js/main.0975c9ec.chunk.js.map",
+    "runtime-main.js": "/graph_editor/static/js/runtime-main.3319b63c.js",
+    "runtime-main.js.map": "/graph_editor/static/js/runtime-main.3319b63c.js.map",
+    "static/css/2.764ccc25.chunk.css": "/graph_editor/static/css/2.764ccc25.chunk.css",
+    "static/js/2.937f7de4.chunk.js": "/graph_editor/static/js/2.937f7de4.chunk.js",
+    "static/js/2.937f7de4.chunk.js.map": "/graph_editor/static/js/2.937f7de4.chunk.js.map",
+    "index.html": "/graph_editor/index.html",
+    "precache-manifest.bbbd329a3ded557863512cdd60579c41.js": "/graph_editor/precache-manifest.bbbd329a3ded557863512cdd60579c41.js",
+    "service-worker.js": "/graph_editor/service-worker.js",
+    "static/css/2.764ccc25.chunk.css.map": "/graph_editor/static/css/2.764ccc25.chunk.css.map",
+    "static/css/main.0c22df1b.chunk.css.map": "/graph_editor/static/css/main.0c22df1b.chunk.css.map",
+    "static/js/2.937f7de4.chunk.js.LICENSE": "/graph_editor/static/js/2.937f7de4.chunk.js.LICENSE"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.3319b63c.js",
+    "static/css/2.764ccc25.chunk.css",
+    "static/js/2.937f7de4.chunk.js",
+    "static/css/main.0c22df1b.chunk.css",
+    "static/js/main.0975c9ec.chunk.js"
+  ]
+}
