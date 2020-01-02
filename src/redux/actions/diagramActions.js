@@ -6,8 +6,11 @@ export const exportArch = model => async dispatch => {
   const Json = createJson(model);
   console.log(Json);
   const { data } = await exportDiagram(JSON.stringify(Json));
+  console.log("data", data);
+  const blob = new Blob([data], { type: "text/plain" });
   dispatch({
     type: actionTypes.EXPORT_DIAGRAM,
     payload: data
   });
+  return blob;
 };

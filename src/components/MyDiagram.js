@@ -22,10 +22,10 @@ class MyDiagram extends React.Component {
     selectedNodeKeys: [],
     model: {
       nodeDataArray: [
-        { key: "Alpha", label: "name", color: "pink", type: "Alpha" },
-        { key: "Betta", label: "name2", color: "blue", type: "Betta" }
+        // { key: "name", label: "name", color: "pink", type: "Input" },
+        // { key: "Betta", label: "name2", color: "blue", type: "Dense" }
       ],
-      linkDataArray: [{ from: "Alpha", to: "Betta" }]
+      linkDataArray: []
     }
   };
 
@@ -56,7 +56,7 @@ class MyDiagram extends React.Component {
         />
         <Button
           style={{ float: "right" }}
-          onClick={() => exportArch({ ...model })}
+          onClick={() => this.onExportArch({ ...model })}
         >
           Export JSON
         </Button>
@@ -71,6 +71,23 @@ class MyDiagram extends React.Component {
 
   onEditPanelClose = () => {
     this.setState({ ...this.state, contextNode: "" });
+  };
+
+  onExportArch = async model => {
+    const blob = await this.props.exportArch(model);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "model.py" || "download";
+    const clickHandler = elem => {
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        elem.removeEventListener("click", () => clickHandler(elem));
+      }, 150);
+    };
+    a.addEventListener("click", () => clickHandler(a), false);
+    a.click();
+    return a;
   };
 
   onNameChange = newName => {

@@ -10,7 +10,7 @@ export const fetchNodeTypes = async () => {
 
 export const exportDiagram = async body => {
   const res = await axios.post(
-    "https://nnio-project.herokuapp.com/architecture/export-from-json-body",
+    "https://nnio-project.herokuapp.com/architecture/export-from-json-body?framework=keras",
     body
   );
   console.log(res);
