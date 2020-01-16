@@ -8,13 +8,11 @@ export default ({ nodeDataArray: nodes, linkDataArray: links }) => {
         inputs.push(Object.entries(link)[0][1]);
       }
     }
-    const input_shape = inputs.length ? {} : { input_shape: [] };
     return {
       name: `${node.label}`,
       type: `${node.type}`,
       inputs: inputs,
       params: {
-        ...input_shape,
         ...node.params
       }
     };
