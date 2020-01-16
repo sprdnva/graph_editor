@@ -22,7 +22,7 @@ const useStyles = makeStyles(() => ({
 const EditPanel = props => {
   const classes = useStyles();
   const { node, onClose, onSubmit, nodeTypes } = props;
-  const [newName, setNewName] = useState("");
+  const [newName, setNewName] = useState(node.label);
   console.log(nodeTypes[node.type]);
   let nodeSchema = nodeTypes[node.type];
 

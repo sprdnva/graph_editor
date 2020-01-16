@@ -60,11 +60,13 @@ class MyDiagram extends React.Component {
         >
           Export JSON
         </Button>
-        <EditPanel
-          node={this.state.contextNode}
-          onClose={this.onEditPanelClose}
-          onSubmit={this.onNodeChange}
-        />
+        {this.state.contextNode && (
+          <EditPanel
+            node={this.state.contextNode}
+            onClose={this.onEditPanelClose}
+            onSubmit={this.onNodeChange}
+          />
+        )}
       </section>
     );
   }
