@@ -5,9 +5,9 @@ import { ToolManager, Diagram } from "gojs";
 import { GojsDiagram, ModelChangeEventType } from "react-gojs";
 
 import MainMenu from "./MainMenu";
-import { EditPanel } from "./EditPanel";
+import EditPanel from "./EditPanel";
 import { getNodeTypes } from "../redux/actions/nodesActions";
-import { exportArch } from "../redux/actions/diagramActions";
+import { exportArch, addNode } from "../redux/actions/diagramActions";
 import "./MyDiagram.css";
 import Modal from "./Modal";
 import { Button } from "@material-ui/core";
@@ -21,16 +21,17 @@ class MyDiagram extends React.Component {
     selectedNode: "",
     selectedNodeKeys: [],
     model: {
-      nodeDataArray: [
-        // { key: "name", label: "name", color: "pink", type: "Input" },
-        // { key: "Betta", label: "name2", color: "blue", type: "Dense" }
-      ],
+      nodeDataArray: [],
       linkDataArray: []
     }
   };
 
   componentWillMount() {
     this.props.getNodeTypes();
+  }
+
+  componentDidUpdate() {
+    console.log(this.props.model);
   }
 
   handleModal(state) {
@@ -40,15 +41,14 @@ class MyDiagram extends React.Component {
   }
 
   render() {
-    const { model } = this.state;
-    const { exportArch } = this.props;
+    const { exportArch, model } = this.props;
     return (
       <section>
         <MainMenu addNode={this.addNode} />
         <GojsDiagram
           key="gojsDiagram"
           diagramId="myDiagramDiv"
-          model={this.state.model}
+          model={model}
           className="myDiagram"
           createDiagram={this.createDiagram}
           onModelChange={this.modelChangeHandler}
@@ -63,7 +63,7 @@ class MyDiagram extends React.Component {
         <EditPanel
           node={this.state.contextNode}
           onClose={this.onEditPanelClose}
-          onSubmit={this.onNameChange}
+          onSubmit={this.onNodeChange}
         />
       </section>
     );
@@ -90,21 +90,19 @@ class MyDiagram extends React.Component {
     return a;
   };
 
-  onNameChange = newName => {
-    const newModel = this.state.model.nodeDataArray.map(node => {
+  onNodeChange = (newName, formData) => {
+    const newModel = this.props.model.nodeDataArray.map(node => {
       if (node.key === this.state.contextNode.key) {
         node.label = newName;
+        node.params = { ...formData };
         console.log(node);
       }
       return node;
     });
     console.log(newModel);
-    this.setState({
-      ...this.state,
-      model: {
-        ...this.state.model,
-        nodeDataArray: newModel
-      }
+    this.props.addNode({
+      ...this.props.model,
+      nodeDataArray: newModel
     });
     this.modelChangeHandler({ eventType: "" });
     this.onEditPanelClose();
@@ -138,36 +136,24 @@ class MyDiagram extends React.Component {
       )
     );
     const that = this;
+    const { addNode } = this.props;
     myDiagram.addDiagramListener("ObjectSingleClicked", function(e) {
       let part = e.subject.part;
       if (!(part instanceof go.Link)) {
         if (e.diagram.selection.count === 1) {
           that.setState({ selectedNode: part.data.key });
         } else if (e.diagram.selection.count === 2 && that.state.selectedNode) {
-          let hasParent;
-          console.log(that.state.model.linkDataArray);
-          that.state.model.linkDataArray.map(connection => {
-            console.log(connection.to);
-            console.log(part.data.key);
-            if (connection.to === part.data.key) {
-              hasParent = true;
-              return;
-            }
+          console.log("run add node");
+          console.log(that.props.model.nodeDataArray);
+          addNode({
+            nodeDataArray: [...that.props.model.nodeDataArray],
+            linkDataArray: [
+              ...that.props.model.linkDataArray,
+              { from: that.state.selectedNode, to: part.data.key }
+            ]
           });
-          if (hasParent) {
-            that.setState({
-              ...that.state,
-              model: {
-                ...that.state.model,
-                linkDataArray: [
-                  ...that.state.model.linkDataArray,
-                  { from: that.state.selectedNode, to: part.data.key }
-                ]
-              }
-            });
-          } else {
-            alert("Can not connect");
-          }
+          console.log("finish add node");
+          console.log(that.props.model);
         }
       }
     });
@@ -189,41 +175,37 @@ class MyDiagram extends React.Component {
   };
 
   removeNode = nodeKey => {
-    const nodeToRemoveIndex = this.state.model.nodeDataArray.findIndex(
+    const { model, addNode } = this.props;
+    const nodeToRemoveIndex = model.nodeDataArray.findIndex(
       node => node.key === nodeKey
     );
     if (nodeToRemoveIndex === -1) {
       return;
     }
-    this.setState({
-      ...this.state,
-      model: {
-        ...this.state.model,
-        nodeDataArray: [
-          ...this.state.model.nodeDataArray.slice(0, nodeToRemoveIndex),
-          ...this.state.model.nodeDataArray.slice(nodeToRemoveIndex + 1)
-        ]
-      }
+    addNode({
+      ...model,
+      nodeDataArray: [
+        ...model.nodeDataArray.slice(0, nodeToRemoveIndex),
+        ...model.nodeDataArray.slice(nodeToRemoveIndex + 1)
+      ]
     });
   };
 
   removeLink = linKToRemove => {
-    const linkToRemoveIndex = this.state.model.linkDataArray.findIndex(
+    const { model, addNode } = this.props;
+    const linkToRemoveIndex = model.linkDataArray.findIndex(
       link => link.from === linKToRemove.from && link.to === linKToRemove.to
     );
     if (linkToRemoveIndex === -1) {
       return;
     }
-    return {
-      ...this.state,
-      model: {
-        ...this.state.model,
-        linkDataArray: [
-          ...this.state.model.linkDataArray.slice(0, linkToRemoveIndex),
-          ...this.state.model.linkDataArray.slice(linkToRemoveIndex + 1)
-        ]
-      }
-    };
+    addNode({
+      ...model,
+      linkDataArray: [
+        ...model.linkDataArray.slice(0, linkToRemoveIndex),
+        ...model.linkDataArray.slice(linkToRemoveIndex + 1)
+      ]
+    });
   };
 
   nodeSelectionHandler = (nodeKey, isSelected) => {
@@ -249,29 +231,27 @@ class MyDiagram extends React.Component {
     }
   };
 
-  addNode = (label, color) => {
+  addNode = async (label, color) => {
+    const { addNode, model } = this.props;
     const newNodeId = "node" + this.nodeId;
     const linksToAdd = this.state.selectedNodeKeys.map(parent => {
       return { from: parent, to: newNodeId };
     });
-    this.setState({
-      ...this.state,
-      model: {
-        ...this.state.model,
-        nodeDataArray: [
-          ...this.state.model.nodeDataArray,
-          {
-            key: newNodeId,
-            label: label || "New Node",
-            color: color || "Blue",
-            type: label || "Node type"
-          }
-        ],
-        linkDataArray:
-          linksToAdd.length > 0
-            ? [...this.state.model.linkDataArray].concat(linksToAdd)
-            : [...this.state.model.linkDataArray]
-      }
+    await addNode({
+      nodeDataArray: [
+        ...model.nodeDataArray,
+        {
+          key: newNodeId,
+          label: newNodeId || "New Node",
+          color: color || "Blue",
+          type: label || "Node type",
+          params: {}
+        }
+      ],
+      linkDataArray:
+        linksToAdd.length > 0
+          ? [...model.linkDataArray].concat(linksToAdd)
+          : [...model.linkDataArray]
     });
     this.nodeId += 1;
   };
@@ -292,9 +272,15 @@ class MyDiagram extends React.Component {
   };
 }
 
+const mapStateToProps = state => ({
+  nodeTypes: state.nodes.nodeTypes,
+  model: state.diagram.model
+});
+
 const mapDispatchToProps = {
   getNodeTypes,
-  exportArch
+  exportArch,
+  addNode
 };
 
-export default connect(null, mapDispatchToProps)(MyDiagram);
+export default connect(mapStateToProps, mapDispatchToProps)(MyDiagram);

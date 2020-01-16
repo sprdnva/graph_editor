@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
+import Form from "react-jsonschema-form";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Drawer,
@@ -18,15 +19,22 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-export const EditPanel = props => {
+const EditPanel = props => {
   const classes = useStyles();
-  const { node, onClose, onSubmit } = props;
+  const { node, onClose, onSubmit, nodeTypes } = props;
   const [newName, setNewName] = useState("");
+  console.log(nodeTypes[node.type]);
+  let nodeSchema = nodeTypes[node.type];
 
   const toggleDrawer = () => event => {
     if (event.type === "keydown" && event.key === "Escape") {
       onClose();
     }
+  };
+
+  const handleSubmit = ({ formData }, e) => {
+    console.log("Data submitted: ", formData);
+    onSubmit(newName, formData);
   };
 
   const sideList = () => (
@@ -36,16 +44,23 @@ export const EditPanel = props => {
       onClick={toggleDrawer(false)}
       onKeyDown={toggleDrawer(false)}
     >
-      <FormControl className="content">
-        <InputLabel htmlFor="my-input">New node name</InputLabel>
-        <Input
-          id="my-input"
-          onChange={e => setNewName(e.target.value)}
-          value={newName}
-        />
-        <Button onClick={() => onSubmit(newName)}>Change name</Button>
-      </FormControl>
-      <div className="content">{node.key}</div>
+      {nodeSchema && (
+        <section>
+          <Input
+            type="text"
+            placeholder={node.label}
+            value={newName}
+            onChange={e => setNewName(e.target.value)}
+          />
+          <Form
+            schema={{ title: "Schema", ...nodeSchema.properties.params }}
+            onChange={console.log("changed")}
+            onSubmit={handleSubmit}
+            onError={console.log("errors")}
+          />
+        </section>
+      )}
+      <div className="content">{node.type}</div>
     </div>
   );
 
@@ -57,3 +72,9 @@ export const EditPanel = props => {
     </div>
   );
 };
+
+const mapStateToProps = state => ({
+  nodeTypes: state.nodes.nodeTypes
+});
+
+export default connect(mapStateToProps)(EditPanel);

@@ -3,18 +3,19 @@ import uuidv4 from "uuid/v4";
 export default ({ nodeDataArray: nodes, linkDataArray: links }) => {
   const layers = nodes.map(node => {
     const inputs = [];
-    links.forEach((link, index) => {
+    for (let link of links) {
       if (Object.entries(link)[1][1] === node.key) {
-        inputs[index] = Object.entries(link)[0][1];
+        inputs.push(Object.entries(link)[0][1]);
       }
-    });
+    }
     const input_shape = inputs.length ? {} : { input_shape: [] };
     return {
-      name: `${node.key}`,
+      name: `${node.label}`,
       type: `${node.type}`,
       inputs: inputs,
       params: {
-        ...input_shape
+        ...input_shape,
+        ...node.params
       }
     };
   });

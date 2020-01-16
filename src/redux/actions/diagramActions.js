@@ -14,3 +14,10 @@ export const exportArch = model => async dispatch => {
   });
   return blob;
 };
+
+export const addNode = model => async dispatch => {
+  dispatch({
+    type: actionTypes.ADD_NODE,
+    payload: model
+  });
+};
