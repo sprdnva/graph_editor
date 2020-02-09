@@ -48,14 +48,19 @@ class MyDiagram extends React.Component {
         <GojsDiagram
           key="gojsDiagram"
           diagramId="myDiagramDiv"
-          model={model}
+          model={this.props.model}
           className="myDiagram"
           createDiagram={this.createDiagram}
           onModelChange={this.modelChangeHandler}
           linkKeyProperty="key"
         />
         <Button
-          style={{ float: "right" }}
+          style={{
+            float: "right",
+            border: "1px solid gray",
+            borderRadius: "5px",
+            margin: "5px 5px"
+          }}
           onClick={() => this.onExportArch({ ...model })}
         >
           Export JSON
@@ -93,8 +98,19 @@ class MyDiagram extends React.Component {
   };
 
   onNodeChange = (newName, formData) => {
-    const newModel = this.props.model.nodeDataArray.map(node => {
+    const { nodeDataArray, linkDataArray } = this.props.model;
+    let oldName;
+    const newModel = nodeDataArray.map(node => {
+      for (let link of linkDataArray) {
+        for (let key in link) {
+          if (link[key] === oldName) {
+            link[key] = newName;
+          }
+        }
+      }
       if (node.key === this.state.contextNode.key) {
+        oldName = node.key;
+        node.key = newName;
         node.label = newName;
         node.params = { ...formData };
         console.log(node);
@@ -103,18 +119,18 @@ class MyDiagram extends React.Component {
     });
     console.log(newModel);
     this.props.addNode({
-      ...this.props.model,
+      linkDataArray,
       nodeDataArray: newModel
     });
-    this.modelChangeHandler({ eventType: "" });
+    // this.modelChangeHandler({ eventType: "" });
     this.onEditPanelClose();
   };
 
   createDiagram = diagramId => {
     const $ = go.GraphObject.make;
     const myDiagram = $(go.Diagram, diagramId, {
-      initialContentAlignment: go.Spot.Center,
-      "undoManager.isEnabled": true
+      "undoManager.isEnabled": true,
+      initialContentAlignment: go.Spot.Center
     });
     myDiagram.nodeTemplate = $(
       go.Node,
@@ -143,19 +159,15 @@ class MyDiagram extends React.Component {
       let part = e.subject.part;
       if (!(part instanceof go.Link)) {
         if (e.diagram.selection.count === 1) {
-          that.setState({ selectedNode: part.data.key });
+          that.setState({ selectedNode: part.data.label });
         } else if (e.diagram.selection.count === 2 && that.state.selectedNode) {
-          console.log("run add node");
-          console.log(that.props.model.nodeDataArray);
           addNode({
             nodeDataArray: [...that.props.model.nodeDataArray],
             linkDataArray: [
               ...that.props.model.linkDataArray,
-              { from: that.state.selectedNode, to: part.data.key }
+              { from: that.state.selectedNode, to: part.data.label }
             ]
           });
-          console.log("finish add node");
-          console.log(that.props.model);
         }
       }
     });

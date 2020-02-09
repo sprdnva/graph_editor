@@ -9,7 +9,7 @@ import { getNodeTypes } from "../redux/actions/nodesActions";
 
 const useStyles = makeStyles(() => ({
   drawerPaper: {
-    width: 180
+    width: 200
   }
 }));
 
@@ -28,7 +28,16 @@ const MainMenu = props => {
       {nodeTypes &&
         Object.keys(nodeTypes).length &&
         Object.keys(nodeTypes).map((type, index) => (
-          <Button key={uuidv4()} onClick={() => addNode(type, colors[index])}>
+          <Button
+            style={{
+              border: "1px solid gray",
+              borderRadius: "5px",
+              margin: "5px",
+              padding: "5px 5px"
+            }}
+            key={uuidv4()}
+            onClick={() => addNode(type, colors[index])}
+          >
             {type}
           </Button>
         ))}

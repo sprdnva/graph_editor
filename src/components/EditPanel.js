@@ -22,6 +22,7 @@ const useStyles = makeStyles(() => ({
 const EditPanel = props => {
   const classes = useStyles();
   const { node, onClose, onSubmit, nodeTypes } = props;
+  console.log(node.params);
   const [newName, setNewName] = useState(node.label);
   console.log(nodeTypes[node.type]);
   let nodeSchema = nodeTypes[node.type];
@@ -53,7 +54,11 @@ const EditPanel = props => {
             onChange={e => setNewName(e.target.value)}
           />
           <Form
-            schema={{ title: "Schema", ...nodeSchema.properties.params }}
+            schema={{
+              title: "Schema",
+              ...nodeSchema.properties.params
+            }}
+            formData={{ ...node.params }}
             onChange={console.log("changed")}
             onSubmit={handleSubmit}
             onError={console.log("errors")}

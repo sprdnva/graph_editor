@@ -32,7 +32,28 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
+}
+
+button.btn-add::after {
+  content: 'Add';
+}
+
+button.array-item-move-up::after {
+  content: 'Move Up';
+}
+
+button.array-item-move-down::after {
+  content: 'Move Down';
+}
+
+button.array-item-remove::after {
+  content: 'Remove';
+}
+
+i.glyphicon {
+  display: none;
 }
