@@ -20,6 +20,7 @@ class MyDiagram extends React.Component {
     contextNode: "",
     selectedNode: "",
     selectedNodeKeys: [],
+    copied: null,
     model: {
       nodeDataArray: [],
       linkDataArray: []
@@ -184,6 +185,20 @@ class MyDiagram extends React.Component {
           }
         );
       }
+    });
+    myDiagram.addDiagramListener("ClipboardChanged", function(e) {
+      that.setState({ copied: e.subject._dataArray[0].data });
+    });
+    myDiagram.addDiagramListener("ClipboardPasted", function(e) {
+      const part = that.state.copied;
+      console.log(that.state.copied);
+      console.log(that.props.model);
+      part.label = part.key = `node${that.nodeId}`;
+      that.props.addNode({
+        ...that.props.model,
+        nodeDataArray: [...that.props.model.nodeDataArray, { ...part }]
+      });
+      that.nodeId += 1;
     });
     return myDiagram;
   };

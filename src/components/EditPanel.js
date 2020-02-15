@@ -11,11 +11,9 @@ import {
 } from "@material-ui/core";
 
 const useStyles = makeStyles(() => ({
-  drawerPaper: {
-    width: 200
-  },
-  content: {
-    padding: 10
+  list: {
+    margin: "5px",
+    width: 250
   }
 }));
 
@@ -65,7 +63,7 @@ const EditPanel = props => {
           />
         </section>
       )}
-      <div className="content">{node.type}</div>
+      <div>{node.type}</div>
     </div>
   );
 
