@@ -128,6 +128,7 @@ class MyDiagram extends React.Component {
   };
 
   createDiagram = diagramId => {
+    document.body.addEventListener('contextmenu', function(e){e.preventDefault(); return false;});
     const $ = go.GraphObject.make;
     const myDiagram = $(go.Diagram, diagramId, {
       "undoManager.isEnabled": true,
