@@ -17,7 +17,11 @@ export const exportDiagram = async (body) => {
   return res;
 };
 
-export const getSharableId = async () => {
-  const res = await axios.post();
+export const getSharableId = async (body) => {
+  const res = await axios.post(
+    'https://nnio-project-dev.herokuapp.com/sharing/share',
+    body
+  );
+  console.log(res.data);
   return res;
 };

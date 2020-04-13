@@ -89,7 +89,7 @@ class MyDiagram extends React.Component {
             borderRadius: '5px',
             margin: '5px 5px',
           }}
-          onClick={() => this.handleShare()}
+          onClick={() => this.handleShare({ ...model })}
         >
           Share
         </Button>
@@ -149,9 +149,8 @@ class MyDiagram extends React.Component {
     this.props.importArch(model);
   };
 
-  handleShare = () => {
-    this.props.shareDiagram();
-    alert(this.props.sharableLink);
+  handleShare = (model) => {
+    this.props.shareDiagram(model);
     console.log(this.props.sharableLink);
   };
 

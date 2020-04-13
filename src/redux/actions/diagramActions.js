@@ -27,9 +27,12 @@ export const exportArchJson = (model) => (dispatch) => {
   return blob;
 };
 
-export const shareDiagram = () => async (dispatch) => {
-  const { data } = await getSharableId();
-  const sharableLink = `https://nnio-project-dev.herokuapp.com/sharing/load?arch_id=${data.id_recieved}`;
+export const shareDiagram = (model) => async (dispatch) => {
+  const json = createJson(model);
+  const { data } = await getSharableId(JSON.stringify(json));
+  console.log(data.data);
+  const sharableLink = `https://nnio-project-dev.herokuapp.com/sharing/load?arch_id=${data}`;
+  console.log(sharableLink);
   dispatch({
     type: actionTypes.SHARE_DIAGRAM,
     payload: sharableLink,
