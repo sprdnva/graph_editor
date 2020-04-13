@@ -1,30 +1,36 @@
-import React from "react";
-import * as go from "gojs";
-import { connect } from "react-redux";
-import { ToolManager, Diagram } from "gojs";
-import { GojsDiagram, ModelChangeEventType } from "react-gojs";
+import React from 'react';
+import * as go from 'gojs';
+import { connect } from 'react-redux';
+import { ToolManager, Diagram } from 'gojs';
+import { ReactDiagram } from 'gojs-react';
 
-import MainMenu from "./MainMenu";
-import EditPanel from "./EditPanel";
-import { getNodeTypes } from "../redux/actions/nodesActions";
-import { exportArch, addNode } from "../redux/actions/diagramActions";
-import "./MyDiagram.css";
-import Modal from "./Modal";
-import { Button } from "@material-ui/core";
-import createJson from "../helpers/createJson";
+import MainMenu from './MainMenu';
+import EditPanel from './EditPanel';
+import { getNodeTypes } from '../redux/actions/nodesActions';
+import {
+  exportArchPy,
+  exportArchJson,
+  addNode,
+  importArch,
+  shareDiagram,
+} from '../redux/actions/diagramActions';
+import './MyDiagram.css';
+import Modal from './Modal';
+import { Button } from '@material-ui/core';
+import createJson from '../helpers/createJson';
 
 class MyDiagram extends React.Component {
   nodeId = 0;
   state = {
     open: false,
-    contextNode: "",
-    selectedNode: "",
+    contextNode: '',
+    selectedNode: '',
     selectedNodeKeys: [],
     copied: null,
     model: {
       nodeDataArray: [],
-      linkDataArray: []
-    }
+      linkDataArray: [],
+    },
   };
 
   componentWillMount() {
@@ -37,35 +43,69 @@ class MyDiagram extends React.Component {
 
   handleModal(state) {
     this.setState({
-      open: state.contextNode.label
+      open: state.contextNode.label,
     });
   }
 
   render() {
-    const { exportArch, model } = this.props;
+    const { model } = this.props;
     return (
       <section>
         <MainMenu addNode={this.addNode} />
-        <GojsDiagram
-          key="gojsDiagram"
-          diagramId="myDiagramDiv"
-          model={this.props.model}
-          className="myDiagram"
-          createDiagram={this.createDiagram}
+        <ReactDiagram
+          divClassName="myDiagram"
+          nodeDataArray={this.props.model.nodeDataArray}
+          linkDataArray={this.props.model.linkDataArray}
+          initDiagram={this.createDiagram}
           onModelChange={this.modelChangeHandler}
           linkKeyProperty="key"
         />
         <Button
           style={{
-            float: "right",
-            border: "1px solid gray",
-            borderRadius: "5px",
-            margin: "5px 5px"
+            float: 'right',
+            border: '1px solid gray',
+            borderRadius: '5px',
+            margin: '5px 5px',
           }}
-          onClick={() => this.onExportArch({ ...model })}
+          onClick={() => this.onExportArch({ ...model }, 'py')}
         >
-          Export JSON
+          Export to code
         </Button>
+        <Button
+          style={{
+            float: 'right',
+            border: '1px solid gray',
+            borderRadius: '5px',
+            margin: '5px 5px',
+          }}
+          onClick={() => this.onExportArch({ ...model }, 'json')}
+        >
+          Export to JSON
+        </Button>
+        <Button
+          style={{
+            float: 'right',
+            border: '1px solid gray',
+            borderRadius: '5px',
+            margin: '5px 5px',
+          }}
+          onClick={() => this.handleShare()}
+        >
+          Share
+        </Button>
+        <input
+          type="file"
+          accept="application/json"
+          id="diagram-import"
+          style={{
+            float: 'right',
+            border: '1px solid gray',
+            borderRadius: '5px',
+            margin: '5px',
+            padding: '7px',
+          }}
+          onChange={(e) => this.renderDiagramFromFile(e)}
+        />
         {this.state.contextNode && (
           <EditPanel
             node={this.state.contextNode}
@@ -78,30 +118,59 @@ class MyDiagram extends React.Component {
   }
 
   onEditPanelClose = () => {
-    this.setState({ ...this.state, contextNode: "" });
+    this.setState({ ...this.state, contextNode: '' });
   };
 
-  onExportArch = async model => {
-    const blob = await this.props.exportArch(model);
+  onExportArch = async (model, format) => {
+    let blob;
+    if (format === 'py') {
+      blob = await this.props.exportArchPy(model);
+    } else if (format === 'json') {
+      blob = this.props.exportArchJson(model);
+    }
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = "model.py" || "download";
-    const clickHandler = elem => {
+    a.download = `model.${format}` || 'download';
+    const clickHandler = (elem) => {
       setTimeout(() => {
         URL.revokeObjectURL(url);
-        elem.removeEventListener("click", () => clickHandler(elem));
+        elem.removeEventListener('click', () => clickHandler(elem));
       }, 150);
     };
-    a.addEventListener("click", () => clickHandler(a), false);
+    a.addEventListener('click', () => clickHandler(a), false);
     a.click();
     return a;
+  };
+
+  onImportArch = (json) => {
+    const model = JSON.parse(json);
+    console.log('import diagram');
+    this.props.importArch(model);
+  };
+
+  handleShare = () => {
+    this.props.shareDiagram();
+    alert(this.props.sharableLink);
+    console.log(this.props.sharableLink);
+  };
+
+  renderDiagramFromFile = (e) => {
+    console.log(e.target.files[0].name);
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsText(file, 'UTF-8');
+      reader.onload = (evt) => {
+        this.onImportArch(evt.target.result);
+      };
+    }
   };
 
   onNodeChange = (newName, formData) => {
     const { nodeDataArray, linkDataArray } = this.props.model;
     let oldName;
-    const newModel = nodeDataArray.map(node => {
+    const newModel = nodeDataArray.map((node) => {
       for (let link of linkDataArray) {
         for (let key in link) {
           if (link[key] === oldName) {
@@ -121,42 +190,45 @@ class MyDiagram extends React.Component {
     console.log(newModel);
     this.props.addNode({
       linkDataArray,
-      nodeDataArray: newModel
+      nodeDataArray: newModel,
     });
     // this.modelChangeHandler({ eventType: "" });
     this.onEditPanelClose();
   };
 
-  createDiagram = diagramId => {
+  createDiagram = (diagramId) => {
     const $ = go.GraphObject.make;
-    const myDiagram = $(go.Diagram, diagramId, {
-      "undoManager.isEnabled": true,
-      initialContentAlignment: go.Spot.Center
+    const myDiagram = $(go.Diagram, {
+      'undoManager.isEnabled': true,
+      initialContentAlignment: go.Spot.Center,
+      model: $(go.GraphLinksModel, {
+        linkKeyProperty: 'key', // IMPORTANT! must be defined for merges and data sync when using GraphLinksModel
+      }),
     });
     myDiagram.nodeTemplate = $(
       go.Node,
-      "Vertical",
-      new go.Binding("location", "loc"),
+      'Vertical',
+      new go.Binding('location', 'loc'),
       $(
         go.Shape,
-        "Circle",
+        'Circle',
         { strokeWidth: 0 },
-        new go.Binding("fill", "color")
+        new go.Binding('fill', 'color')
       ),
       $(
         go.TextBlock,
-        { position: "relative" },
-        new go.Binding("text", "label")
+        { position: 'relative' },
+        new go.Binding('text', 'label').makeTwoWay()
       ),
       $(
         go.TextBlock,
-        { margin: 8, font: "Italic small-caps bold 13px Georgia, Serif" },
-        new go.Binding("text", "type")
+        { margin: 8, font: 'Italic small-caps bold 13px Georgia, Serif' },
+        new go.Binding('text', 'type')
       )
     );
     const that = this;
     const { addNode } = this.props;
-    myDiagram.addDiagramListener("ObjectSingleClicked", function(e) {
+    myDiagram.addDiagramListener('ObjectSingleClicked', function (e) {
       let part = e.subject.part;
       if (!(part instanceof go.Link)) {
         if (e.diagram.selection.count === 1) {
@@ -166,19 +238,19 @@ class MyDiagram extends React.Component {
             nodeDataArray: [...that.props.model.nodeDataArray],
             linkDataArray: [
               ...that.props.model.linkDataArray,
-              { from: that.state.selectedNode, to: part.data.label }
-            ]
+              { from: that.state.selectedNode, to: part.data.label },
+            ],
           });
         }
       }
     });
-    myDiagram.addDiagramListener("ObjectContextClicked", function(e) {
+    myDiagram.addDiagramListener('ObjectContextClicked', function (e) {
       let part = e.subject.part;
       if (!(part instanceof go.Link)) {
         that.setState(
           {
             ...that.state,
-            contextNode: part.data
+            contextNode: part.data,
           },
           () => {
             console.log(that.state.contextNode);
@@ -186,27 +258,28 @@ class MyDiagram extends React.Component {
         );
       }
     });
-    myDiagram.addDiagramListener("ClipboardChanged", function(e) {
+    myDiagram.addDiagramListener('ClipboardChanged', function (e) {
       that.setState({ copied: e.subject._dataArray[0].data });
     });
-    myDiagram.addDiagramListener("ClipboardPasted", function(e) {
+    myDiagram.addDiagramListener('ClipboardPasted', function (e) {
       const part = that.state.copied;
       console.log(that.state.copied);
       console.log(that.props.model);
       part.label = part.key = `node${that.nodeId}`;
       that.props.addNode({
         ...that.props.model,
-        nodeDataArray: [...that.props.model.nodeDataArray, { ...part }]
+        nodeDataArray: [...that.props.model.nodeDataArray, { ...part }],
       });
       that.nodeId += 1;
     });
+
     return myDiagram;
   };
 
-  removeNode = nodeKey => {
+  removeNode = (nodeKey) => {
     const { model, addNode } = this.props;
     const nodeToRemoveIndex = model.nodeDataArray.findIndex(
-      node => node.key === nodeKey
+      (node) => node.key === nodeKey
     );
     if (nodeToRemoveIndex === -1) {
       return;
@@ -215,15 +288,15 @@ class MyDiagram extends React.Component {
       ...model,
       nodeDataArray: [
         ...model.nodeDataArray.slice(0, nodeToRemoveIndex),
-        ...model.nodeDataArray.slice(nodeToRemoveIndex + 1)
-      ]
+        ...model.nodeDataArray.slice(nodeToRemoveIndex + 1),
+      ],
     });
   };
 
-  removeLink = linKToRemove => {
+  removeLink = (linKToRemove) => {
     const { model, addNode } = this.props;
     const linkToRemoveIndex = model.linkDataArray.findIndex(
-      link => link.from === linKToRemove.from && link.to === linKToRemove.to
+      (link) => link.from === linKToRemove.from && link.to === linKToRemove.to
     );
     if (linkToRemoveIndex === -1) {
       return;
@@ -232,8 +305,8 @@ class MyDiagram extends React.Component {
       ...model,
       linkDataArray: [
         ...model.linkDataArray.slice(0, linkToRemoveIndex),
-        ...model.linkDataArray.slice(linkToRemoveIndex + 1)
-      ]
+        ...model.linkDataArray.slice(linkToRemoveIndex + 1),
+      ],
     });
   };
 
@@ -241,11 +314,11 @@ class MyDiagram extends React.Component {
     if (isSelected) {
       this.setState({
         ...this.state,
-        selectedNodeKeys: [...this.state.selectedNodeKeys, nodeKey]
+        selectedNodeKeys: [...this.state.selectedNodeKeys, nodeKey],
       });
     } else {
       const nodeIndexToRemove = this.state.selectedNodeKeys.findIndex(
-        key => key === nodeKey
+        (key) => key === nodeKey
       );
       if (nodeIndexToRemove === -1) {
         return;
@@ -254,16 +327,16 @@ class MyDiagram extends React.Component {
         ...this.state,
         selectedNodeKeys: [
           ...this.state.selectedNodeKeys.slice(0, nodeIndexToRemove),
-          ...this.state.selectedNodeKeys.slice(nodeIndexToRemove + 1)
-        ]
+          ...this.state.selectedNodeKeys.slice(nodeIndexToRemove + 1),
+        ],
       });
     }
   };
 
   addNode = async (label, color) => {
     const { addNode, model } = this.props;
-    const newNodeId = "node" + this.nodeId;
-    const linksToAdd = this.state.selectedNodeKeys.map(parent => {
+    const newNodeId = 'node' + this.nodeId;
+    const linksToAdd = this.state.selectedNodeKeys.map((parent) => {
       return { from: parent, to: newNodeId };
     });
     await addNode({
@@ -271,45 +344,58 @@ class MyDiagram extends React.Component {
         ...model.nodeDataArray,
         {
           key: newNodeId,
-          label: newNodeId || "New Node",
-          color: color || "Blue",
-          type: label || "Node type",
-          params: {}
-        }
+          label: newNodeId || 'New Node',
+          color: color || 'Blue',
+          type: label || 'Node type',
+          params: {},
+        },
       ],
       linkDataArray:
         linksToAdd.length > 0
           ? [...model.linkDataArray].concat(linksToAdd)
-          : [...model.linkDataArray]
+          : [...model.linkDataArray],
     });
     this.nodeId += 1;
   };
 
-  modelChangeHandler = event => {
+  modelChangeHandler = (event) => {
     switch (event.eventType) {
-      case ModelChangeEventType.Remove:
-        if (event.nodeData) {
-          this.removeNode(event.nodeData.key);
-        }
-        if (event.linkData) {
-          this.removeLink(event.linkData);
-        }
-        break;
+      // case ModelChangeEventType.Remove:
+      //   if (event.nodeData) {
+      //     this.removeNode(event.nodeData.key);
+      //   }
+      //   if (event.linkData) {
+      //     this.removeLink(event.linkData);
+      //   }
+      //   break;
+      // case ModelChangeEventType.Add:
+      //   if (event.nodeData) {
+      //     console.log('add node');
+      //   }
+      //   if (event.linkData) {
+      //     console.log('add link');
+      //   }
+      //   break;
       default:
+        alert(event.eventType);
         break;
     }
   };
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   nodeTypes: state.nodes.nodeTypes,
-  model: state.diagram.model
+  model: state.diagram.model,
+  link: state.diagram.sharableLink,
 });
 
 const mapDispatchToProps = {
   getNodeTypes,
-  exportArch,
-  addNode
+  exportArchPy,
+  exportArchJson,
+  importArch,
+  addNode,
+  shareDiagram,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MyDiagram);

@@ -1,11 +1,12 @@
-import actionTypes from "../actionTypes/diagramActionTypes";
+import actionTypes from '../actionTypes/diagramActionTypes';
+import { shareDiagram } from '../actions/diagramActions';
 
 const initialState = {
-  exportRes: "",
+  exportRes: '',
   model: {
     nodeDataArray: [],
-    linkDataArray: []
-  }
+    linkDataArray: [],
+  },
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -14,6 +15,11 @@ export default (state = initialState, { type, payload }) => {
       return { ...state, exportRes: payload };
     case actionTypes.ADD_NODE:
       return { ...state, model: payload };
+    case actionTypes.IMPORT_DIAGRAM:
+      return { ...state, model: payload };
+    case actionTypes.SHARE_DIAGRAM:
+      return { ...state, sharableLink: payload };
+    case actionTypes.EXPORT_DIAGRAM_JSON:
     default:
       return { ...state };
   }
