@@ -1,5 +1,10 @@
 import actionTypes from '../actionTypes/diagramActionTypes';
-import { exportDiagram, getSharableId } from '../../services';
+import {
+  exportDiagram,
+  getSharableId,
+  getDiagramFromUrl,
+  getExportParams,
+} from '../../services';
 import createJson from '../../helpers/createJson';
 import { json, imp } from '../../helpers/importJson';
 
@@ -14,6 +19,17 @@ export const exportArchPy = (model) => async (dispatch) => {
     payload: data,
   });
   return blob;
+};
+
+export const getExportQueryParams = () => async (dispatch) => {
+  const data = await getExportParams();
+  console.log(data);
+  if (!data) {
+    dispatch({
+      type: actionTypes.GET_EXPORT_PARAMETERS,
+      payload: data,
+    });
+  }
 };
 
 export const exportArchJson = (model) => (dispatch) => {
@@ -43,6 +59,15 @@ export const importArch = (importModel) => async (dispatch) => {
   const model = imp(importModel);
   dispatch({
     type: actionTypes.IMPORT_DIAGRAM,
+    payload: model,
+  });
+};
+
+export const importArchFromUrl = (url) => async (dispatch) => {
+  const { data } = await getDiagramFromUrl(url);
+  const model = imp(data);
+  dispatch({
+    type: actionTypes.IMPORT_DIAGRAM_FROM_URL,
     payload: model,
   });
 };

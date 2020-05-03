@@ -13,11 +13,14 @@ import {
   addNode,
   importArch,
   shareDiagram,
+  getExportQueryParams,
 } from '../redux/actions/diagramActions';
 import './MyDiagram.css';
 import Modal from './Modal';
 import { Button } from '@material-ui/core';
 import createJson from '../helpers/createJson';
+import CustomSnackbar from './Snackbar';
+import FormDialog from './QueryParametersDialog';
 
 class MyDiagram extends React.Component {
   nodeId = 0;
@@ -49,6 +52,7 @@ class MyDiagram extends React.Component {
 
   render() {
     const { model } = this.props;
+    const error = '';
     return (
       <section>
         <MainMenu addNode={this.addNode} />
@@ -113,6 +117,15 @@ class MyDiagram extends React.Component {
             onSubmit={this.onNodeChange}
           />
         )}
+        {error && (
+          <CustomSnackbar
+            vertical="top"
+            horizontal="right"
+            message="test"
+            severity="info"
+          />
+        )}
+        <FormDialog />
       </section>
     );
   }
@@ -121,7 +134,7 @@ class MyDiagram extends React.Component {
     this.setState({ ...this.state, contextNode: '' });
   };
 
-  onExportArch = async (model, format) => {
+  handleExportArch = async (model, format) => {
     let blob;
     if (format === 'py') {
       blob = await this.props.exportArchPy(model);
@@ -141,6 +154,10 @@ class MyDiagram extends React.Component {
     a.addEventListener('click', () => clickHandler(a), false);
     a.click();
     return a;
+  };
+
+  onExportArch = async (model, format) => {
+    await this.props.getExportQueryParams();
   };
 
   onImportArch = (json) => {
@@ -357,29 +374,29 @@ class MyDiagram extends React.Component {
     this.nodeId += 1;
   };
 
-  modelChangeHandler = (event) => {
-    switch (event.eventType) {
-      // case ModelChangeEventType.Remove:
-      //   if (event.nodeData) {
-      //     this.removeNode(event.nodeData.key);
-      //   }
-      //   if (event.linkData) {
-      //     this.removeLink(event.linkData);
-      //   }
-      //   break;
-      // case ModelChangeEventType.Add:
-      //   if (event.nodeData) {
-      //     console.log('add node');
-      //   }
-      //   if (event.linkData) {
-      //     console.log('add link');
-      //   }
-      //   break;
-      default:
-        alert(event.eventType);
-        break;
-    }
-  };
+  // modelChangeHandler = (event) => {
+  //   switch (event.eventType) {
+  //     // case ModelChangeEventType.Remove:
+  //     //   if (event.nodeData) {
+  //     //     this.removeNode(event.nodeData.key);
+  //     //   }
+  //     //   if (event.linkData) {
+  //     //     this.removeLink(event.linkData);
+  //     //   }
+  //     //   break;
+  //     // case ModelChangeEventType.Add:
+  //     //   if (event.nodeData) {
+  //     //     console.log('add node');
+  //     //   }
+  //     //   if (event.linkData) {
+  //     //     console.log('add link');
+  //     //   }
+  //     //   break;
+  //     default:
+  //       alert(event.eventType);
+  //       break;
+  //   }
+  // };
 }
 
 const mapStateToProps = (state) => ({
@@ -395,6 +412,7 @@ const mapDispatchToProps = {
   importArch,
   addNode,
   shareDiagram,
+  getExportQueryParams,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MyDiagram);

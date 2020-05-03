@@ -4,7 +4,15 @@ export const fetchNodeTypes = async () => {
   const res = await axios.get(
     'https://nnio-project-dev.herokuapp.com/admin/layers_schemas'
   );
-  console.log(res);
+  return res;
+};
+
+export const getExportParams = async () => {
+  const response = await axios.get(
+    'https://nnio-project-dev.herokuapp.com/openapi.json'
+  );
+  const res = await response.data.paths['/architecture/export-from-json-body']
+    .post.parameters;
   return res;
 };
 
@@ -13,7 +21,6 @@ export const exportDiagram = async (body) => {
     'https://nnio-project-dev.herokuapp.com/architecture/export-from-json-body?framework=keras&keras_prefer_sequential=1&line_break=crlf&indent=spaces_8',
     body
   );
-  console.log(res);
   return res;
 };
 
@@ -22,6 +29,11 @@ export const getSharableId = async (body) => {
     'https://nnio-project-dev.herokuapp.com/sharing/share',
     body
   );
-  console.log(res.data);
+  return res;
+};
+
+export const getDiagramFromUrl = async (url) => {
+  const res = await axios.get(url);
+  console.log(res);
   return res;
 };
