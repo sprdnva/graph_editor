@@ -41,5 +41,3 @@ export const imp = (json) => {
   const model = { nodeDataArray, linkDataArray };
   return model;
 };
-
-imp(json);

@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Drawer, Button, Input } from '@material-ui/core';
 import uuidv4 from 'uuid/v4';
 import { importArchFromUrl } from '../redux/actions/diagramActions';
+import distinctColors from 'distinct-colors';
 
 const useStyles = makeStyles(() => ({
   drawerPaper: {
@@ -23,7 +24,7 @@ const MainMenu = (props) => {
   };
 
   const classes = useStyles();
-  const colors = ['#88dee3', '#ffcf99', '#82ab79', '#ab93ad'];
+  const colors = distinctColors({ count: 100, lightMin: 20, lightMax: 90 });
   const { addNode, nodeTypes } = props;
   return (
     <Drawer
@@ -44,7 +45,7 @@ const MainMenu = (props) => {
               padding: '5px 5px',
             }}
             key={uuidv4()}
-            onClick={() => addNode(type, colors[index])}
+            onClick={() => addNode(type, colors[index].name())}
           >
             {type}
           </Button>

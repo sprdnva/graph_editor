@@ -3,7 +3,7 @@ import * as go from 'gojs';
 import { connect } from 'react-redux';
 import { ToolManager, Diagram } from 'gojs';
 import { ReactDiagram } from 'gojs-react';
-
+import CloseIcon from '@material-ui/icons/Close';
 import MainMenu from './MainMenu';
 import EditPanel from './EditPanel';
 import { getNodeTypes } from '../redux/actions/nodesActions';
@@ -17,7 +17,7 @@ import {
 } from '../redux/actions/diagramActions';
 import './MyDiagram.css';
 import Modal from './Modal';
-import { Button } from '@material-ui/core';
+import { Button, Snackbar } from '@material-ui/core';
 import createJson from '../helpers/createJson';
 import CustomSnackbar from './Snackbar';
 import FormDialog from './QueryParametersDialog';
@@ -34,6 +34,7 @@ class MyDiagram extends React.Component {
       nodeDataArray: [],
       linkDataArray: [],
     },
+    error: '',
   };
 
   componentWillMount() {
@@ -41,7 +42,7 @@ class MyDiagram extends React.Component {
   }
 
   componentDidUpdate() {
-    console.log(this.props.model);
+    // console.log(this.props.model);
   }
 
   handleModal(state) {
@@ -52,7 +53,6 @@ class MyDiagram extends React.Component {
 
   render() {
     const { model } = this.props;
-    const error = '';
     return (
       <section>
         <MainMenu addNode={this.addNode} />
@@ -65,37 +65,22 @@ class MyDiagram extends React.Component {
           linkKeyProperty="key"
         />
         <Button
-          style={{
-            float: 'right',
-            border: '1px solid gray',
-            borderRadius: '5px',
-            margin: '5px 5px',
-          }}
+          className="controls_bottom"
           onClick={() => this.onExportArch({ ...model }, 'py')}
         >
           Export to code
         </Button>
         <Button
-          style={{
-            float: 'right',
-            border: '1px solid gray',
-            borderRadius: '5px',
-            margin: '5px 5px',
-          }}
-          onClick={() => this.onExportArch({ ...model }, 'json')}
+          className="controls_bottom"
+          onClick={() => this.handleExportArch({ ...model }, 'json')}
         >
-          Export to JSON
+          Save work (.json)
         </Button>
         <Button
-          style={{
-            float: 'right',
-            border: '1px solid gray',
-            borderRadius: '5px',
-            margin: '5px 5px',
-          }}
+          className="controls_bottom"
           onClick={() => this.handleShare({ ...model })}
         >
-          Share
+          Generate sharing link
         </Button>
         <input
           type="file"
@@ -117,15 +102,29 @@ class MyDiagram extends React.Component {
             onSubmit={this.onNodeChange}
           />
         )}
-        {error && (
-          <CustomSnackbar
-            vertical="top"
-            horizontal="right"
-            message="test"
-            severity="info"
-          />
-        )}
-        <FormDialog />
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          ContentProps={{
+            classes: {
+              root: 'error_snackbar',
+            },
+          }}
+          open={this.props.error}
+          autoHideDuration={6000}
+          message="Error"
+          action={
+            <CloseIcon fontSize="small" onClick={this.handleCloseError} />
+          }
+        ></Snackbar>
+        <FormDialog
+          open={this.state.open}
+          onClose={() => {
+            this.handleFormDialog(false);
+          }}
+        />
       </section>
     );
   }
@@ -133,6 +132,8 @@ class MyDiagram extends React.Component {
   onEditPanelClose = () => {
     this.setState({ ...this.state, contextNode: '' });
   };
+
+  handleCloseError = () => {};
 
   handleExportArch = async (model, format) => {
     let blob;
@@ -156,8 +157,14 @@ class MyDiagram extends React.Component {
     return a;
   };
 
+  handleFormDialog = (status) => {
+    this.setState({ open: status });
+  };
+
   onExportArch = async (model, format) => {
     await this.props.getExportQueryParams();
+    console.log(this.props.exportParams);
+    this.handleFormDialog(true);
   };
 
   onImportArch = (json) => {
@@ -403,6 +410,8 @@ const mapStateToProps = (state) => ({
   nodeTypes: state.nodes.nodeTypes,
   model: state.diagram.model,
   link: state.diagram.sharableLink,
+  exportParams: state.diagram.exportQueryParams,
+  error: state.diagram.exportError,
 });
 
 const mapDispatchToProps = {

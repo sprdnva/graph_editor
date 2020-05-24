@@ -6,7 +6,8 @@ const initialState = {
     nodeDataArray: [],
     linkDataArray: [],
   },
-  exportQueryParams: {},
+  exportQueryParams: [],
+  exportError: '',
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -21,7 +22,9 @@ export default (state = initialState, { type, payload }) => {
     case actionTypes.SHARE_DIAGRAM:
       return { ...state, sharableLink: payload };
     case actionTypes.GET_EXPORT_PARAMETERS:
-      return { ...state, exportQueryParams: { ...payload } };
+      return { ...state, exportQueryParams: [...payload] };
+    case actionTypes.EXPORT_DIAGRAM_FAIL:
+      return { ...state, exportError: payload };
     case actionTypes.EXPORT_DIAGRAM_JSON:
     default:
       return { ...state };

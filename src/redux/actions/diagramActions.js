@@ -11,25 +11,29 @@ import { json, imp } from '../../helpers/importJson';
 export const exportArchPy = (model) => async (dispatch) => {
   const json = createJson(model);
   console.log(json);
-  const { data } = await exportDiagram(JSON.stringify(json));
-  console.log('data', data);
-  const blob = new Blob([data], { type: 'text/plain' });
-  dispatch({
-    type: actionTypes.EXPORT_DIAGRAM_PYTHON,
-    payload: data,
-  });
-  return blob;
+  try {
+    const { data } = await exportDiagram(JSON.stringify(json));
+    console.log('data', data);
+    const blob = new Blob([data], { type: 'text/plain' });
+    dispatch({
+      type: actionTypes.EXPORT_DIAGRAM_PYTHON,
+      payload: data,
+    });
+    return blob;
+  } catch (error) {
+    dispatch({
+      type: actionTypes.EXPORT_DIAGRAM_FAIL,
+      payload: error.message,
+    });
+  }
 };
 
 export const getExportQueryParams = () => async (dispatch) => {
   const data = await getExportParams();
-  console.log(data);
-  if (!data) {
-    dispatch({
-      type: actionTypes.GET_EXPORT_PARAMETERS,
-      payload: data,
-    });
-  }
+  dispatch({
+    type: actionTypes.GET_EXPORT_PARAMETERS,
+    payload: data,
+  });
 };
 
 export const exportArchJson = (model) => (dispatch) => {
