@@ -3,7 +3,7 @@ import { connect, useDispatch } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import { Drawer, Button, Input } from '@material-ui/core';
 import uuidv4 from 'uuid/v4';
-import { importArchFromUrl } from '../redux/actions/diagramActions';
+import { importArchFromUrl } from '../../redux/actions/diagramActions';
 import distinctColors from 'distinct-colors';
 
 const useStyles = makeStyles(() => ({
