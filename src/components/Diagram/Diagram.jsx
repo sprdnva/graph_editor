@@ -6,7 +6,7 @@ import { ReactDiagram } from 'gojs-react';
 import CloseIcon from '@material-ui/icons/Close';
 import MainMenu from './MainMenu';
 import EditPanel from './EditPanel';
-import { getNodeTypes } from '../redux/actions/nodesActions';
+import { getNodeTypes } from '../../redux/actions/nodesActions';
 import {
   exportArchPy,
   exportArchJson,
@@ -14,13 +14,13 @@ import {
   importArch,
   shareDiagram,
   getExportQueryParams,
-} from '../redux/actions/diagramActions';
+} from '../../redux/actions/diagramActions';
 import './MyDiagram.css';
 import Modal from './Modal';
 import { Button, Snackbar } from '@material-ui/core';
-import createJson from '../helpers/createJson';
-import CustomSnackbar from './Snackbar';
-import FormDialog from './QueryParametersDialog';
+import createJson from '../../helpers/createJson';
+import CustomSnackbar from '../shared/Snackbar';
+import FormDialog from '../QueryParametersDialog/QueryParametersDialog';
 
 class MyDiagram extends React.Component {
   nodeId = 0;
