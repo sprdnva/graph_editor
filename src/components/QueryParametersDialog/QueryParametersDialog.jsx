@@ -8,23 +8,34 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { useState } from 'react';
 import ExportParamsForm from '../ExportParamsForm/ExportParamsForm';
 
-const FormDialog = ({ open, onClose }) => {
+const FormDialog = ({ open, onClose, onHandleSubmit }) => {
   const exportParams = useSelector(
     (state) => state.diagram.exportQueryParams,
     shallowEqual
   );
 
+  const [paramsString, setParamsString] = useState('');
+
+  const handleDone = () => {
+    onHandleSubmit(paramsString);
+    setParamsString('');
+    onClose();
+  };
+
   return (
     <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title">
       <DialogTitle id="form-dialog-title">Select Parameters</DialogTitle>
       <DialogContent>
-        <ExportParamsForm exportParams={exportParams} />
+        <ExportParamsForm
+          exportParams={exportParams}
+          setParamsString={setParamsString}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">
           Cancel
         </Button>
-        <Button onClick={onClose} color="primary">
+        <Button onClick={handleDone} color="primary">
           Done
         </Button>
       </DialogActions>

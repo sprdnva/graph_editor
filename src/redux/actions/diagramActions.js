@@ -8,11 +8,11 @@ import {
 import createJson from '../../lib/createJson';
 import { json, imp } from '../../lib/importJson';
 
-export const exportArchPy = (model) => async (dispatch) => {
+export const exportArchPy = (model, params) => async (dispatch) => {
   const json = createJson(model);
   console.log(json);
   try {
-    const { data } = await exportDiagram(JSON.stringify(json));
+    const { data } = await exportDiagram(JSON.stringify(json), params);
     console.log('data', data);
     const blob = new Blob([data], { type: 'text/plain' });
     dispatch({
@@ -21,6 +21,7 @@ export const exportArchPy = (model) => async (dispatch) => {
     });
     return blob;
   } catch (error) {
+    console.log(error.message);
     dispatch({
       type: actionTypes.EXPORT_DIAGRAM_FAIL,
       payload: error.message,
@@ -34,6 +35,10 @@ export const getExportQueryParams = () => async (dispatch) => {
     type: actionTypes.GET_EXPORT_PARAMETERS,
     payload: data,
   });
+};
+
+export const resetError = () => async (dispatch) => {
+  dispatch({ type: actionTypes.RESET_EXPORT_ERROR });
 };
 
 export const exportArchJson = (model) => (dispatch) => {

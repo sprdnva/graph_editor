@@ -19,12 +19,17 @@ export const getExportParams = async () => {
   return res;
 };
 
-export const exportDiagram = async (body) => {
-  const res = await axios.post(
-    `${baseUrl}/architecture/export-from-json-body?framework=keras&keras_prefer_sequential=1&line_break=crlf&indent=spaces_8`,
-    body
-  );
-  return res;
+export const exportDiagram = async (body, params) => {
+  let res;
+  try {
+    res = await axios.post(
+      `${baseUrl}/architecture/export-from-json-body${params}`,
+      body
+    );
+    return res;
+  } catch (error) {
+    throw Error(error.message);
+  }
 };
 
 export const getDiagramFromUrl = async (url) => {

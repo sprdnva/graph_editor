@@ -14,6 +14,7 @@ import {
   importArch,
   shareDiagram,
   getExportQueryParams,
+  resetError,
 } from '../../redux/actions/diagramActions';
 import './MyDiagram.css';
 // import Modal from './Modal';
@@ -114,8 +115,8 @@ class MyDiagram extends React.Component {
             },
           }}
           open={this.props.error}
-          autoHideDuration={6000}
-          message="Error"
+          autoHideDuration={5000}
+          message={'Export error. Please check layers configuration'}
           action={
             <CloseIcon fontSize="small" onClick={this.handleCloseError} />
           }
@@ -131,6 +132,7 @@ class MyDiagram extends React.Component {
           onClose={() => {
             this.handleFormDialog(false);
           }}
+          onHandleSubmit={this.handleParamsSubmit}
         />
       </section>
     );
@@ -140,35 +142,43 @@ class MyDiagram extends React.Component {
     this.setState({ ...this.state, contextNode: '' });
   };
 
-  handleCloseError = () => {};
+  handleParamsSubmit = (params) => {
+    this.handleExportArch(this.state.model, 'py', params);
+  };
 
-  handleExportArch = async (model, format) => {
+  handleExportArch = async (model, format, params) => {
     let blob;
     if (format === 'py') {
-      blob = await this.props.exportArchPy(model);
+      blob = await this.props.exportArchPy(model, params);
     } else if (format === 'json') {
       blob = this.props.exportArchJson(model);
     }
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `model.${format}` || 'download';
-    const clickHandler = (elem) => {
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-        elem.removeEventListener('click', () => clickHandler(elem));
-      }, 150);
-    };
-    a.addEventListener('click', () => clickHandler(a), false);
-    a.click();
-    return a;
+    if (!this.props.error) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `model.${format}` || 'download';
+      const clickHandler = (elem) => {
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+          elem.removeEventListener('click', () => clickHandler(elem));
+        }, 150);
+      };
+      a.addEventListener('click', () => clickHandler(a), false);
+      a.click();
+      return a;
+    }
+  };
+
+  handleCloseError = () => {
+    this.props.resetError();
   };
 
   handleFormDialog = (status) => {
     this.setState({ open: status });
   };
 
-  onExportArch = async (model, format) => {
+  onExportArch = async () => {
     await this.props.getExportQueryParams();
     console.log(this.props.exportParams);
     this.handleFormDialog(true);
@@ -433,6 +443,7 @@ const mapDispatchToProps = {
   addNode,
   shareDiagram,
   getExportQueryParams,
+  resetError,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MyDiagram);

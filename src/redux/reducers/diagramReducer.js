@@ -25,6 +25,8 @@ export default (state = initialState, { type, payload }) => {
       return { ...state, exportQueryParams: [...payload] };
     case actionTypes.EXPORT_DIAGRAM_FAIL:
       return { ...state, exportError: payload };
+    case actionTypes.RESET_EXPORT_ERROR:
+      return { ...state, exportError: '' };
     case actionTypes.EXPORT_DIAGRAM_JSON:
     default:
       return { ...state };

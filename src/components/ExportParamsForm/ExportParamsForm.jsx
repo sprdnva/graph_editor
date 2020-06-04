@@ -7,12 +7,15 @@ import {
   MenuItem,
 } from '@material-ui/core';
 
-const ExportParamsForm = ({ exportParams }) => {
-  const [params, setParam] = useState({});
+const ExportParamsForm = ({ exportParams, setParamsString }) => {
+  const [params, setParams] = useState({});
 
   const handleSelect = (event) => {
     const { name, value } = event.target;
-    setParam({ ...params, [name]: value });
+    setParamsString(
+      (prevState) => `${prevState ? prevState + '&' : '?'}${name}=${value}`
+    );
+    setParams({ ...params, [name]: value });
   };
 
   const renderSwitchField = (param) => {
