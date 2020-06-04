@@ -4,8 +4,8 @@ import { connect } from 'react-redux';
 import { ToolManager, Diagram } from 'gojs';
 import { ReactDiagram } from 'gojs-react';
 import CloseIcon from '@material-ui/icons/Close';
-import MainMenu from './MainMenu';
-import EditPanel from './EditPanel';
+import MainMenu from '../MainMenu/MainMenu';
+import EditPanel from '../EditPanel/EditPanel';
 import { getNodeTypes } from '../../redux/actions/nodesActions';
 import {
   exportArchPy,
@@ -16,11 +16,11 @@ import {
   getExportQueryParams,
 } from '../../redux/actions/diagramActions';
 import './MyDiagram.css';
-import Modal from './Modal';
+// import Modal from './Modal';
 import { Button, Snackbar } from '@material-ui/core';
-import createJson from '../../helpers/createJson';
-import CustomSnackbar from '../shared/Snackbar';
+import createJson from '../../lib/createJson';
 import FormDialog from '../QueryParametersDialog/QueryParametersDialog';
+import ShareModal from '../generic/ShareModal';
 
 class MyDiagram extends React.Component {
   nodeId = 0;
@@ -35,6 +35,7 @@ class MyDiagram extends React.Component {
       linkDataArray: [],
     },
     error: '',
+    shareOpen: false,
   };
 
   componentWillMount() {
@@ -119,6 +120,12 @@ class MyDiagram extends React.Component {
             <CloseIcon fontSize="small" onClick={this.handleCloseError} />
           }
         ></Snackbar>
+        {this.state.shareOpen && (
+          <ShareModal
+            open={this.state.shareOpen}
+            handleClose={this.handleShareClose}
+          ></ShareModal>
+        )}
         <FormDialog
           open={this.state.open}
           onClose={() => {
@@ -175,7 +182,11 @@ class MyDiagram extends React.Component {
 
   handleShare = (model) => {
     this.props.shareDiagram(model);
-    console.log(this.props.sharableLink);
+    this.setState({ shareOpen: true });
+  };
+
+  handleShareClose = () => {
+    this.setState({ shareOpen: false });
   };
 
   renderDiagramFromFile = (e) => {

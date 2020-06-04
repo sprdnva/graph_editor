@@ -5,8 +5,8 @@ import {
   getDiagramFromUrl,
   getExportParams,
 } from '../../services';
-import createJson from '../../helpers/createJson';
-import { json, imp } from '../../helpers/importJson';
+import createJson from '../../lib/createJson';
+import { json, imp } from '../../lib/importJson';
 
 export const exportArchPy = (model) => async (dispatch) => {
   const json = createJson(model);
@@ -50,8 +50,7 @@ export const exportArchJson = (model) => (dispatch) => {
 export const shareDiagram = (model) => async (dispatch) => {
   const json = createJson(model);
   const { data } = await getSharableId(JSON.stringify(json));
-  console.log(data.data);
-  const sharableLink = `https://nnio-project-dev.herokuapp.com/sharing/load?arch_id=${data}`;
+  const sharableLink = `https://nnio-project.herokuapp.com/sharing/load?arch_id=${data}`;
   console.log(sharableLink);
   dispatch({
     type: actionTypes.SHARE_DIAGRAM,

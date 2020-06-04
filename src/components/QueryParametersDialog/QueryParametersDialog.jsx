@@ -6,7 +6,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { useState } from 'react';
-import ExportParamsForm from './ExportParamsForm';
+import ExportParamsForm from '../ExportParamsForm/ExportParamsForm';
 
 const FormDialog = ({ open, onClose }) => {
   const exportParams = useSelector(
