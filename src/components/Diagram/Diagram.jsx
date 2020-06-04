@@ -115,6 +115,7 @@ class MyDiagram extends React.Component {
             },
           }}
           open={this.props.error}
+          onClose={this.handleCloseError}
           autoHideDuration={5000}
           message={'Export error. Please check layers configuration'}
           action={
@@ -143,16 +144,18 @@ class MyDiagram extends React.Component {
   };
 
   handleParamsSubmit = (params) => {
-    this.handleExportArch(this.state.model, 'py', params);
+    this.handleExportArch(this.props.model, 'py', params);
   };
 
   handleExportArch = async (model, format, params) => {
+    console.log(model);
     let blob;
     if (format === 'py') {
       blob = await this.props.exportArchPy(model, params);
     } else if (format === 'json') {
       blob = this.props.exportArchJson(model);
     }
+    console.log(this.props.error);
     if (!this.props.error) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');

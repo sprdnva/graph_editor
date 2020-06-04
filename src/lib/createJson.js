@@ -1,6 +1,7 @@
 import uuidv4 from 'uuid/v4';
 
 export default ({ nodeDataArray: nodes, linkDataArray: links }) => {
+  console.log(nodes);
   const layers = nodes.map((node) => {
     const inputs = [];
 

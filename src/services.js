@@ -22,6 +22,7 @@ export const getExportParams = async () => {
 export const exportDiagram = async (body, params) => {
   let res;
   try {
+    console.log(body);
     res = await axios.post(
       `${baseUrl}/architecture/export-from-json-body${params}`,
       body
