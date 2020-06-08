@@ -29,7 +29,7 @@ const FormDialog = ({ open, onClose, onHandleSubmit }) => {
     console.log(paramsArray);
     const paramsString = `?${paramsArray.join('&')}`;
     onHandleSubmit(paramsString);
-    setParameters({});
+    setParameters({ framework: 'keras' });
     onClose();
   };
 

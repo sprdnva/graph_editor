@@ -12,9 +12,9 @@ export const exportArchPy = (model, params) => async (dispatch) => {
   const json = createJson(model);
   console.log(json);
   try {
-    const { data } = await exportDiagram(JSON.stringify(json), params);
+    const data = await exportDiagram(JSON.stringify(json), params);
     console.log('data', data);
-    const blob = new Blob([data], { type: 'text/plain' });
+    const blob = new Blob([data.data], { type: 'text/plain' });
     dispatch({
       type: actionTypes.EXPORT_DIAGRAM_PYTHON,
       payload: data,
