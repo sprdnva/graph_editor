@@ -1,3 +1,4 @@
+import distinctColors from 'distinct-colors';
 export const json = {
   date_created: '2020-04-05T16:01:14.917Z',
   id: 'b3adea47-3d20-4e6f-9d79-a75a8c9e9d1c',
@@ -26,14 +27,22 @@ export const json = {
   ],
 };
 
+const colors = distinctColors({ count: 100, lightMin: 20, lightMax: 90 });
+
 export const imp = (json) => {
   const linkDataArray = [];
   const nodeDataArray = [];
-  json.layers.map(({ name, type, inputs, params }) => {
+  json.layers.map(({ name, type, inputs, params }, index) => {
     for (let i = 0; i < inputs.length; i++) {
       linkDataArray.push({ from: inputs[i], to: name });
     }
-    nodeDataArray.push({ key: name, label: name, color: 'blue', type, params });
+    nodeDataArray.push({
+      key: name,
+      label: name,
+      color: colors[index].name(),
+      type,
+      params,
+    });
   });
   console.log(linkDataArray);
   console.log(nodeDataArray);

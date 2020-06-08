@@ -119,7 +119,9 @@ class MyDiagram extends React.Component {
           open={this.props.error}
           onClose={this.handleCloseError}
           autoHideDuration={5000}
-          message={'Export error.'}
+          message={
+            this.props.error.length > 70 ? 'Export error' : this.props.error
+          }
           action={
             <CloseIcon fontSize="small" onClick={this.handleCloseError} />
           }
