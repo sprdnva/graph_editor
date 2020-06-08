@@ -239,7 +239,7 @@ class MyDiagram extends React.Component {
       linkDataArray,
       nodeDataArray: newModel,
     });
-    // this.modelChangeHandler({ eventType: "" });
+    // this.modelChangeHandler({ eventType: '' });
     this.onEditPanelClose();
   };
 
@@ -413,29 +413,29 @@ class MyDiagram extends React.Component {
     this.nodeId += 1;
   };
 
-  // modelChangeHandler = (event) => {
-  //   switch (event.eventType) {
-  //     // case ModelChangeEventType.Remove:
-  //     //   if (event.nodeData) {
-  //     //     this.removeNode(event.nodeData.key);
-  //     //   }
-  //     //   if (event.linkData) {
-  //     //     this.removeLink(event.linkData);
-  //     //   }
-  //     //   break;
-  //     // case ModelChangeEventType.Add:
-  //     //   if (event.nodeData) {
-  //     //     console.log('add node');
-  //     //   }
-  //     //   if (event.linkData) {
-  //     //     console.log('add link');
-  //     //   }
-  //     //   break;
-  //     default:
-  //       alert(event.eventType);
-  //       break;
-  //   }
-  // };
+  modelChangeHandler = (event) => {
+    switch (event.eventType) {
+      // case ModelChangeEventType.Remove:
+      //   if (event.nodeData) {
+      //     this.removeNode(event.nodeData.key);
+      //   }
+      //   if (event.linkData) {
+      //     this.removeLink(event.linkData);
+      //   }
+      //   break;
+      // case ModelChangeEventType.Add:
+      //   if (event.nodeData) {
+      //     console.log('add node');
+      //   }
+      //   if (event.linkData) {
+      //     console.log('add link');
+      //   }
+      //   break;
+      default:
+        alert(event.eventType);
+        break;
+    }
+  };
 }
 
 const mapStateToProps = (state) => ({

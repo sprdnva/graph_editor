@@ -14,7 +14,7 @@ const ExportParamsForm = ({ exportParams, setParameters, parameters }) => {
 
   const handleSelect = (event) => {
     const { name, value } = event.target;
-    setParameters((prevState) => ({ ...prevState, [name]: value }));
+    setParameters(() => ({ ...parameters, [name]: value }));
     setParams({ ...params, [name]: value });
   };
 
