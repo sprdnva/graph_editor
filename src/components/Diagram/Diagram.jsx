@@ -38,6 +38,7 @@ class MyDiagram extends React.Component {
     error: '',
     shareOpen: false,
     nodesDeleting: [],
+    linksDeleting: [],
   };
 
   componentWillMount() {
@@ -118,7 +119,7 @@ class MyDiagram extends React.Component {
           open={this.props.error}
           onClose={this.handleCloseError}
           autoHideDuration={5000}
-          message={'Export error. Please check layers configuration'}
+          message={'Export error.'}
           action={
             <CloseIcon fontSize="small" onClick={this.handleCloseError} />
           }
@@ -331,6 +332,13 @@ class MyDiagram extends React.Component {
             nodesDeleting: [...that.state.nodesDeleting, part.data.label],
           });
           console.log(part.data.label);
+        } else if (part instanceof go.Link) {
+          that.setState({
+            linksDeleting: [
+              ...that.state.linksDeleting,
+              [part.data.from, part.data.to],
+            ],
+          });
         }
       });
     });
@@ -338,11 +346,20 @@ class MyDiagram extends React.Component {
       const newNodeDataArray = that.props.model.nodeDataArray.filter(
         (node) => that.state.nodesDeleting.indexOf(node.label) === -1
       );
+      const linksDeletingFrom = that.state.linksDeleting.map((link) => link[0]);
+      const linksDeletingTo = that.state.linksDeleting.map((link) => link[1]);
+      const newLinkDataArray = that.props.model.linkDataArray.filter(
+        (link) =>
+          linksDeletingFrom.indexOf(link.from) === -1 ||
+          linksDeletingFrom.indexOf(link.from) !==
+            linksDeletingTo.indexOf(link.to)
+      );
       console.log(that.state.nodesDeleting);
       console.log('newNodeDataArray', newNodeDataArray);
       that.props.addNode({
         ...that.props.model,
         nodeDataArray: newNodeDataArray,
+        linkDataArray: newLinkDataArray,
       });
     });
 
