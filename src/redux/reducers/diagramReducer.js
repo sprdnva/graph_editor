@@ -8,6 +8,7 @@ const initialState = {
   },
   exportQueryParams: [],
   exportError: '',
+  nodeId: 0,
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -18,7 +19,7 @@ export default (state = initialState, { type, payload }) => {
       return { ...state, model: payload };
     case actionTypes.IMPORT_DIAGRAM:
     case actionTypes.IMPORT_DIAGRAM_FROM_URL:
-      return { ...state, model: payload };
+      return { ...state, model: payload, nodeId: payload.nodeDataArray.length };
     case actionTypes.SHARE_DIAGRAM:
       return { ...state, sharableLink: payload };
     case actionTypes.GET_EXPORT_PARAMETERS:
@@ -27,6 +28,8 @@ export default (state = initialState, { type, payload }) => {
       return { ...state, exportError: payload };
     case actionTypes.RESET_EXPORT_ERROR:
       return { ...state, exportError: '' };
+    case actionTypes.CHANGE_NODE_ID:
+      return { ...state, nodeId: state.nodeId + 1 };
     case actionTypes.EXPORT_DIAGRAM_JSON:
     default:
       return { ...state };

@@ -1,7 +1,7 @@
-import actionTypes from "../actionTypes/nodesActionTypes";
+import actionTypes from '../actionTypes/nodesActionTypes';
 
 const initialState = {
-  nodeTypes: {}
+  nodeTypes: {},
 };
 
 export default (state = initialState, { type, payload }) => {

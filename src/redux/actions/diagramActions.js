@@ -85,3 +85,9 @@ export const addNode = (model) => async (dispatch) => {
     payload: model,
   });
 };
+
+export const changeNodeId = () => async (dispatch) => {
+  dispatch({
+    type: actionTypes.CHANGE_NODE_ID,
+  });
+};

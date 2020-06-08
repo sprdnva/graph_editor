@@ -15,6 +15,7 @@ import {
   shareDiagram,
   getExportQueryParams,
   resetError,
+  changeNodeId,
 } from '../../redux/actions/diagramActions';
 import './MyDiagram.css';
 // import Modal from './Modal';
@@ -24,7 +25,6 @@ import FormDialog from '../QueryParametersDialog/QueryParametersDialog';
 import ShareModal from '../generic/ShareModal';
 
 class MyDiagram extends React.Component {
-  nodeId = 0;
   state = {
     open: false,
     contextNode: '',
@@ -43,10 +43,6 @@ class MyDiagram extends React.Component {
 
   componentWillMount() {
     this.props.getNodeTypes();
-  }
-
-  componentDidUpdate() {
-    // console.log(this.props.model);
   }
 
   handleModal(state) {
@@ -320,12 +316,12 @@ class MyDiagram extends React.Component {
       const part = that.state.copied;
       console.log(that.state.copied);
       console.log(that.props.model);
-      part.label = part.key = `node${that.nodeId}`;
+      part.label = part.key = `node${that.props.nodeId}`;
       that.props.addNode({
         ...that.props.model,
         nodeDataArray: [...that.props.model.nodeDataArray, { ...part }],
       });
-      that.nodeId += 1;
+      that.props.changeNodeId();
     });
     myDiagram.addDiagramListener('SelectionDeleting', function (e) {
       e.diagram.selection.map((part) => {
@@ -431,7 +427,7 @@ class MyDiagram extends React.Component {
 
   addNode = async (label, color) => {
     const { addNode, model } = this.props;
-    const newNodeId = 'node' + this.nodeId;
+    const newNodeId = 'node' + this.props.nodeId;
     const linksToAdd = this.state.selectedNodeKeys.map((parent) => {
       return { from: parent, to: newNodeId };
     });
@@ -451,7 +447,7 @@ class MyDiagram extends React.Component {
           ? [...model.linkDataArray].concat(linksToAdd)
           : [...model.linkDataArray],
     });
-    this.nodeId += 1;
+    this.props.changeNodeId();
   };
 
   // modelChangeHandler = (event) => {
@@ -485,6 +481,7 @@ const mapStateToProps = (state) => ({
   link: state.diagram.sharableLink,
   exportParams: state.diagram.exportQueryParams,
   error: state.diagram.exportError,
+  nodeId: state.diagram.nodeId,
 });
 
 const mapDispatchToProps = {
@@ -496,6 +493,7 @@ const mapDispatchToProps = {
   shareDiagram,
   getExportQueryParams,
   resetError,
+  changeNodeId,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MyDiagram);
