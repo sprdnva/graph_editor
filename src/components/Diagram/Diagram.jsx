@@ -37,6 +37,7 @@ class MyDiagram extends React.Component {
     },
     error: '',
     shareOpen: false,
+    nodesDeleting: [],
   };
 
   componentWillMount() {
@@ -323,6 +324,27 @@ class MyDiagram extends React.Component {
       });
       that.nodeId += 1;
     });
+    myDiagram.addDiagramListener('SelectionDeleting', function (e) {
+      e.diagram.selection.map((part) => {
+        if (!(part instanceof go.Link) && part.isSelected) {
+          that.setState({
+            nodesDeleting: [...that.state.nodesDeleting, part.data.label],
+          });
+          console.log(part.data.label);
+        }
+      });
+    });
+    myDiagram.addDiagramListener('SelectionDeleted', function (e) {
+      const newNodeDataArray = that.props.model.nodeDataArray.filter(
+        (node) => that.state.nodesDeleting.indexOf(node.label) === -1
+      );
+      console.log(that.state.nodesDeleting);
+      console.log('newNodeDataArray', newNodeDataArray);
+      that.props.addNode({
+        ...that.props.model,
+        nodeDataArray: newNodeDataArray,
+      });
+    });
 
     return myDiagram;
   };
@@ -413,29 +435,29 @@ class MyDiagram extends React.Component {
     this.nodeId += 1;
   };
 
-  modelChangeHandler = (event) => {
-    switch (event.eventType) {
-      // case ModelChangeEventType.Remove:
-      //   if (event.nodeData) {
-      //     this.removeNode(event.nodeData.key);
-      //   }
-      //   if (event.linkData) {
-      //     this.removeLink(event.linkData);
-      //   }
-      //   break;
-      // case ModelChangeEventType.Add:
-      //   if (event.nodeData) {
-      //     console.log('add node');
-      //   }
-      //   if (event.linkData) {
-      //     console.log('add link');
-      //   }
-      //   break;
-      default:
-        alert(event.eventType);
-        break;
-    }
-  };
+  // modelChangeHandler = (event) => {
+  //   switch (event.eventType) {
+  //     // case ModelChangeEventType.Remove:
+  //     //   if (event.nodeData) {
+  //     //     this.removeNode(event.nodeData.key);
+  //     //   }
+  //     //   if (event.linkData) {
+  //     //     this.removeLink(event.linkData);
+  //     //   }
+  //     //   break;
+  //     // case ModelChangeEventType.Add:
+  //     //   if (event.nodeData) {
+  //     //     console.log('add node');
+  //     //   }
+  //     //   if (event.linkData) {
+  //     //     console.log('add link');
+  //     //   }
+  //     //   break;
+  //     default:
+  //       alert(event.eventType);
+  //       break;
+  //   }
+  // };
 }
 
 const mapStateToProps = (state) => ({
