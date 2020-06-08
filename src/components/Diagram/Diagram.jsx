@@ -280,7 +280,11 @@ class MyDiagram extends React.Component {
       if (!(part instanceof go.Link)) {
         if (e.diagram.selection.count === 1) {
           that.setState({ selectedNode: part.data.label });
-        } else if (e.diagram.selection.count === 2 && that.state.selectedNode) {
+        } else if (
+          e.diagram.selection.count === 2 &&
+          that.state.selectedNode &&
+          that.state.selectedNode !== part.data.label
+        ) {
           addNode({
             nodeDataArray: [...that.props.model.nodeDataArray],
             linkDataArray: [
