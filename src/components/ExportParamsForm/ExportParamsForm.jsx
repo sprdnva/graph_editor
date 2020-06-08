@@ -7,14 +7,22 @@ import {
   MenuItem,
 } from '@material-ui/core';
 
-const ExportParamsForm = ({ exportParams, setParamsString }) => {
-  const [params, setParams] = useState({});
+const ExportParamsForm = ({ exportParams, setParameters, parameters }) => {
+  const [params, setParams] = useState({
+    framework: 'keras',
+  });
 
   const handleSelect = (event) => {
     const { name, value } = event.target;
-    setParamsString(
-      (prevState) => `${prevState ? prevState + '&' : '?'}${name}=${value}`
-    );
+    setParameters((prevState) => ({ ...prevState, [name]: value }));
+    setParams({ ...params, [name]: value });
+  };
+
+  const handleCheck = (name, value) => {
+    setParameters(() => {
+      console.log(parameters);
+      return { ...parameters, [name]: value };
+    });
     setParams({ ...params, [name]: value });
   };
 
@@ -23,7 +31,14 @@ const ExportParamsForm = ({ exportParams, setParamsString }) => {
     if (schema.type) {
       switch (schema.type) {
         case 'boolean': {
-          return <Checkbox />;
+          return (
+            <Checkbox
+              disableRipple={true}
+              name={param.name}
+              value={!!params[param.name]}
+              onChange={() => handleCheck(param.name, !params[param.name])}
+            />
+          );
         }
       }
     } else if (schema.enum) {
@@ -31,7 +46,7 @@ const ExportParamsForm = ({ exportParams, setParamsString }) => {
         <Select
           name={param.name}
           style={{ marginTop: 0 }}
-          value={params[param.name] || schema.default || ''}
+          value={params[param.name] || schema.default || schema.enum[0]}
           onChange={(e) => handleSelect(e)}
         >
           {schema.enum.map((value, index) => (

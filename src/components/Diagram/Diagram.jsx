@@ -246,7 +246,7 @@ class MyDiagram extends React.Component {
   createDiagram = (diagramId) => {
     const $ = go.GraphObject.make;
     const myDiagram = $(go.Diagram, {
-      'undoManager.isEnabled': true,
+      // 'undoManager.isEnabled': true,
       initialContentAlignment: go.Spot.Center,
       model: $(go.GraphLinksModel, {
         linkKeyProperty: 'key', // IMPORTANT! must be defined for merges and data sync when using GraphLinksModel
@@ -324,6 +324,7 @@ class MyDiagram extends React.Component {
   };
 
   removeNode = (nodeKey) => {
+    console.log('remove node');
     const { model, addNode } = this.props;
     const nodeToRemoveIndex = model.nodeDataArray.findIndex(
       (node) => node.key === nodeKey
@@ -338,9 +339,11 @@ class MyDiagram extends React.Component {
         ...model.nodeDataArray.slice(nodeToRemoveIndex + 1),
       ],
     });
+    console.log(model);
   };
 
   removeLink = (linKToRemove) => {
+    console.log('remove link');
     const { model, addNode } = this.props;
     const linkToRemoveIndex = model.linkDataArray.findIndex(
       (link) => link.from === linKToRemove.from && link.to === linKToRemove.to
@@ -358,6 +361,7 @@ class MyDiagram extends React.Component {
   };
 
   nodeSelectionHandler = (nodeKey, isSelected) => {
+    console.log('nodeSelectionHandler');
     if (isSelected) {
       this.setState({
         ...this.state,

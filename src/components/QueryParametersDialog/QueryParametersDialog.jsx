@@ -14,11 +14,22 @@ const FormDialog = ({ open, onClose, onHandleSubmit }) => {
     shallowEqual
   );
 
-  const [paramsString, setParamsString] = useState('');
+  const [parameters, setParameters] = useState({
+    framework: 'keras',
+  });
+
+  // const [paramsString, setParamsString] = useState('');
 
   const handleDone = () => {
+    const paramsArray = Object.keys(parameters).map((key) => {
+      if (parameters[key]) {
+        return `${key}=${parameters[key]}`;
+      }
+    });
+    console.log(paramsArray);
+    const paramsString = `?${paramsArray.join('&')}`;
     onHandleSubmit(paramsString);
-    setParamsString('');
+    setParameters({});
     onClose();
   };
 
@@ -28,7 +39,8 @@ const FormDialog = ({ open, onClose, onHandleSubmit }) => {
       <DialogContent>
         <ExportParamsForm
           exportParams={exportParams}
-          setParamsString={setParamsString}
+          parameters={parameters}
+          setParameters={setParameters}
         />
       </DialogContent>
       <DialogActions>
